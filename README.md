@@ -55,6 +55,14 @@ PINATA_JWT="your_pinata_jwt"
 
 ## Usage
 
+### Start Algokit Environment (Optional)
+
+Start Docker & Run this command to start Localnet (If using Localnet Configuration in .env):
+
+```bash
+algokit localnet reset
+```
+
 ### Compilation (Optional)
 
 Compile ARC18 contract using:
