@@ -1,4 +1,4 @@
-# ARC18 Implementation in TypeScript
+# ARC18 Implementation in Tealscript
 
 This project implements the ARC18 standard for royalty specification in Algorand NFT trading. ARC18 provides a standardized way to handle royalty payments for NFT transactions on the Algorand blockchain.
 
