@@ -1,0 +1,226 @@
+{
+  "name": "Arc18",
+  "desc": "",
+  "methods": [
+    {
+      "name": "optInToApplication",
+      "args": [],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "set_administrator",
+      "args": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "createApplication",
+      "args": [],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "set_policy",
+      "args": [
+        {
+          "name": "royalty_basis",
+          "type": "uint64"
+        },
+        {
+          "name": "royalty_receiver",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "set_payment_asset",
+      "args": [
+        {
+          "name": "payment_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "is_allowed",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "transfer_algo_payment",
+      "args": [
+        {
+          "name": "royalty_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "royalty_asset_amount",
+          "type": "uint64"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "royalty_receiver",
+          "type": "address"
+        },
+        {
+          "name": "payment",
+          "type": "pay"
+        },
+        {
+          "name": "current_offer_amount",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "transfer_asset_payment",
+      "args": [
+        {
+          "name": "royalty_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "royalty_asset_amount",
+          "type": "uint64"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "royalty_receiver",
+          "type": "address"
+        },
+        {
+          "name": "payment",
+          "type": "axfer"
+        },
+        {
+          "name": "payment_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "current_offer_amount",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "offer",
+      "args": [
+        {
+          "name": "royalty_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "royalty_asset_amount",
+          "type": "uint64"
+        },
+        {
+          "name": "auth_address",
+          "type": "address"
+        },
+        {
+          "name": "offered_amount",
+          "type": "uint64"
+        },
+        {
+          "name": "offered_auth_addr",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "royalty_free_move",
+      "args": [
+        {
+          "name": "royalty_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "royalty_asset_amount",
+          "type": "uint64"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "offered_amount",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "get_policy",
+      "args": [],
+      "returns": {
+        "type": "(address,uint64)"
+      }
+    },
+    {
+      "name": "get_offer",
+      "args": [
+        {
+          "name": "royalty_asset",
+          "type": "uint64"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "type": "(address,uint64)"
+      }
+    },
+    {
+      "name": "get_administrator",
+      "args": [],
+      "returns": {
+        "type": "address"
+      }
+    }
+  ]
+}
