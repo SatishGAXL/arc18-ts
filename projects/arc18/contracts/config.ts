@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
+// Load environment variables from .env file
 config({ path: __dirname + `/../.env` });
 
+// Check if required environment variables are present
 if (
   !process.env.ALGOD_PORT ||
   !process.env.ALGOD_URL ||
@@ -15,6 +17,7 @@ if (
   );
 }
 
+// Export environment variables
 export const ALGOD_PORT = Number(process.env.ALGOD_PORT);
 export const ALGOD_URL = process.env.ALGOD_URL;
 export const ALGOD_TOKEN = process.env.ALGOD_TOKEN;

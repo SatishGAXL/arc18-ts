@@ -5,10 +5,12 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils';
 import { IpfsUploader } from './ipfsUploader';
 import { ALGOD_PORT, ALGOD_TOKEN, ALGOD_URL, ASSET_URL, PINATA_JWT, TXN_URL, WALLET_MNEMONIC } from './config';
 
+// Initialize Algorand client
 let algorand: AlgorandClient = AlgorandClient.fromClients({
   algod: new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_URL, ALGOD_PORT),
 });
 
+// Function to fund an account with Algos
 const fund = async (address: string, amount: number) => {
   const dispenser = algosdk.mnemonicToSecretKey(WALLET_MNEMONIC);
   const suggestedParams = await algorand.client.algod.getTransactionParams().do();
@@ -29,6 +31,7 @@ const fund = async (address: string, amount: number) => {
   }
 };
 
+// Function to get detailed account balances
 const getDetailedBalances = async (address: string) => {
   const r = await algorand.client.algod.accountInformation(address).do();
   const balance = algosdk.microalgosToAlgos(r['amount-without-pending-rewards']);
@@ -41,23 +44,27 @@ const getDetailedBalances = async (address: string) => {
   };
 };
 
+// Function to round a number to a specific scale
 const roundwithScale = (num: number, scale: number) => {
   return Math.round((num + Number.EPSILON) * 10 ** scale) / 10 ** scale;
 };
 
 (async () => {
+  // Generate accounts for contract creator, admin, NFT owner, buyer, and royalty recipient
   const contract_creator = algosdk.generateAccount();
   const contract_admin = algosdk.generateAccount();
   const nft_owner = algosdk.generateAccount();
   const buyer = algosdk.generateAccount();
   const royalty_recipient = algosdk.generateAccount();
 
+  // Fund the generated accounts
   await fund(contract_creator.addr, 10);
   await fund(contract_admin.addr, 10);
   await fund(nft_owner.addr, 10);
   await fund(buyer.addr, 10);
   await fund(royalty_recipient.addr, 1);
 
+  // Initialize the Arc18Client
   const Caller = new Arc18Client(
     {
       resolveBy: 'id',
@@ -65,11 +72,14 @@ const roundwithScale = (num: number, scale: number) => {
     },
     algorand.client.algod
   );
+  // Create the application
   await Caller.create.createApplication({}, { sender: contract_creator });
 
+  // Get the application ID and address
   const { appId, appAddress } = await Caller.appClient.getAppReference();
   console.log('APP ID : ', appId);
 
+  // Get the administrator
   var res = await Caller.getAdministrator({}, { sender: contract_creator });
   console.log(
     `
@@ -78,6 +88,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Set a new administrator
   var res1 = await Caller.setAdministrator({ new_admin: contract_admin.addr }, { sender: contract_creator });
   console.log(
     `
@@ -86,6 +97,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get the administrator again to confirm the change
   var res3 = await Caller.getAdministrator({}, { sender: contract_creator });
   console.log(
     `
@@ -94,6 +106,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Set the royalty policy
   const royalty_percentage = 5;
 
   var res4 = await Caller.setPolicy(
@@ -112,6 +125,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get the royalty policy to confirm it was set correctly
   var res5 = await Caller.getPolicy({}, { sender: contract_admin });
   console.log(
     `
@@ -122,9 +136,11 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Initialize IPFS uploader
   const ipfs = new IpfsUploader('pinata', {
     pinataJwt: PINATA_JWT,
   });
+  // Upload NFT metadata to IPFS
   const metadata_hash = await ipfs.uploadJsonToIPFS({
     name: 'PixelTree',
     description: 'Unique, handcrafted 32x32 pixel trees',
@@ -142,6 +158,7 @@ const roundwithScale = (num: number, scale: number) => {
       },
     },
   });
+  // Create the NFT
   var suggestedParams = await algorand.client.algod.getTransactionParams().do();
   const nft_txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
     from: nft_owner.addr,
@@ -168,6 +185,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // NFT owner opts-in to the application
   const res12 = await Caller.optIn.optInToApplication({}, { sender: nft_owner });
   console.log(
     `
@@ -176,6 +194,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Create an offer for the NFT
   const res8 = await Caller.offer(
     {
       royalty_asset: Number(res6['asset-index']),
@@ -197,6 +216,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get the offer details
   const res9 = await Caller.getOffer(
     { royalty_asset: Number(res6['asset-index']), from: nft_owner.addr },
     { sender: buyer, accounts: [nft_owner.addr] }
@@ -213,6 +233,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get balances before the transfer
   const bnftOwnerBalance = await getDetailedBalances(nft_owner.addr);
   const broyaltyReciptentBalance = await getDetailedBalances(royalty_recipient.addr);
   console.log(
@@ -223,6 +244,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Buyer opts-in to the asset
   suggestedParams = await algorand.client.algod.getTransactionParams().do();
   const asset_optin_txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
     assetIndex: Number(res6['asset-index']),
@@ -243,6 +265,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Transfer Algo payment with royalty
   const amountToBePaid = 1;
   suggestedParams = await algorand.client.algod.getTransactionParams().do();
   const xferTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
@@ -277,6 +300,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get balances after the transfer
   const anftOwnerBalance = await getDetailedBalances(nft_owner.addr);
   const aroyaltyReciptentBalance = await getDetailedBalances(royalty_recipient.addr);
   console.log(
@@ -289,6 +313,7 @@ const roundwithScale = (num: number, scale: number) => {
     `
   );
 
+  // Get the offer again to see if it has been updated
   const res11 = await Caller.getOffer(
     { royalty_asset: Number(res6['asset-index']), from: nft_owner.addr },
     { sender: buyer, accounts: [nft_owner.addr] }
